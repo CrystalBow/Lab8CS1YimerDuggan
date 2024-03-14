@@ -26,11 +26,59 @@ size_t Size(void* ptr)
 {
 	return ((size_t*)ptr)[-1];
 }
-
+void printArray(int pData[], int dataSz);
 // implement merge sort
 // extraMemoryAllocated counts bytes of extra memory allocated
-void mergeSort(int pData[], int l, int r)
+void mergeSort(int pData[], int left, int right)
 {
+    int *leftArray, *rightArray;
+    int temp, counter, otherTemp, counterR = 0, counterL = 0;
+    if (left >= right-1) {
+        if (pData[left] > pData[right]) {
+            temp = pData[left];
+            pData[left] = pData[right];
+            pData[right] = temp;
+            return;
+        }
+        return;
+    }
+    temp = (right + left)/2;
+    otherTemp = temp + 1;
+    leftArray = (int*) Alloc(sizeof(int)*(temp+1));
+    for (counter = 0; counter <= temp; counter++) {
+        leftArray[counter] = pData[counter];
+    }
+    rightArray = (int*) Alloc(sizeof(int)*(right - otherTemp + 1));
+    for (counter = counter; counter <= right; counter++) {
+        rightArray[counter-otherTemp] = pData[counter];
+    }
+    mergeSort(leftArray, 0, temp);
+    mergeSort(rightArray, 0, right-otherTemp);
+    counter = 0;
+
+    while ((counterL <= temp) || (counterR <= right-otherTemp)) {
+        if ((counterL <= temp) && (counterR <= right-otherTemp)) {
+            if (leftArray[counterL] >= rightArray[counterR]) {
+                pData[counter] = rightArray[counterR];
+                counterR++;
+                counter++;
+            } else {
+                pData[counter] = leftArray[counterL];
+                counterL++;
+                counter++;
+            }
+        } else if (counterR <= right-otherTemp) {
+            pData[counter] = rightArray[counterR];
+            counterR++;
+            counter++;
+        } else if (counterL <= temp) {
+            pData[counter] = leftArray[counterL];
+            counterL++;
+            counter++;
+        }
+    }
+    DeAlloc(leftArray);
+    DeAlloc(rightArray);
 }
 
 // parses input file to an integer array
@@ -69,12 +117,15 @@ void printArray(int pData[], int dataSz)
 {
 	int i, sz = dataSz - 100;
 	printf("\tData:\n\t");
-	for (i=0;i<100;++i)
-	{
-		printf("%d ",pData[i]);
-	}
-	printf("\n\t");
-	
+    if (dataSz < 100) {
+        sz = 0;
+    } else {
+        for (i=0;i<100;++i)
+        {
+            printf("%d ",pData[i]);
+        }
+        printf("\n\t");
+    }
 	for (i=sz;i<dataSz;++i)
 	{
 		printf("%d ",pData[i]);
